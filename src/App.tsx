@@ -1,10 +1,14 @@
 import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import router from './router';
 
-const App = () => {
+const App = (): JSX.Element => {
   return (
-    <div className="App">
-      Hello
-    </div>
+    <Routes>
+      {router.map(({ path, element }, index) => (
+        <Route key={index} path={path} element={element} />
+      ))}
+    </Routes>
   );
 }
 
