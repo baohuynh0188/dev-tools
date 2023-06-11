@@ -1,22 +1,20 @@
-import React, { Fragment } from 'react'
-import { Container, Row } from 'react-bootstrap'
-import Navbar from '../components/Navbar'
+import React, { Fragment } from "react";
+import Navbar from "../components/Navbar";
+import Notification from "../components/Notification";
+import { Outlet } from "react-router-dom";
 
-const Layout = ({ children }: any): JSX.Element => {
-  return (
-    <Fragment>
-    <Navbar />
-    <Container>
-      <Row>
-        <div className="d-flex justify-content-center">
-          <div className="w-75 m-3">
-            {children}
-          </div>
-        </div>
-      </Row>
-    </Container>
-  </Fragment>
-  )
-}
+const Layout = (): JSX.Element => {
+    return (
+        <Fragment>
+            <Navbar />
+            <Notification />
+            <div className="container">
+                <div className="row mt-3">
+                    <Outlet />
+                </div>
+            </div>
+        </Fragment>
+    );
+};
 
-export default Layout
+export default Layout;

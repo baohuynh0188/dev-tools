@@ -1,29 +1,25 @@
+import NotFoundPage from "./pages/NotFoundPage";
+import SearchResultPage from "./pages/notes/SearchResultPage";
 import ReleaseTagsPage from "./pages/releasetags/ReleaseTagsPage";
-import HomePage from "./pages/sharemoney/HomePage";
-import SplitBillPage from "./pages/sharemoney/SplitBillPage";
 
 interface IRouter {
     path: string;
     element: JSX.Element;
-  }
-  
-  const router: IRouter[] = [
-    // {
-    //   path: '*',
-    //   element: <NotFoundPage />,
-    // },
+}
+
+const router: IRouter[] = [
     {
-      path: '/',
-      element: <ReleaseTagsPage />,
+        path: "*",
+        element: <NotFoundPage />,
     },
     {
-      path: '/share-money',
-      element: <HomePage />,
+        path: "/",
+        element: <ReleaseTagsPage />,
     },
     {
-      path: '/share-money/bill/:id',
-      element: <SplitBillPage />,
+        path: "/posts",
+        element: <SearchResultPage />,
     },
-  ];
-  
-  export default router;
+];
+
+export default router;
