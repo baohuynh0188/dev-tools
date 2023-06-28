@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthModal from "./Modals/AuthModal";
+import { AuthContext } from "../contexts/AuthContext";
 
 const Navbar = (): JSX.Element => {
+    const userInfo = useContext(AuthContext);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<"Sign In" | "Sign Up">(
         "Sign In"
@@ -25,8 +27,6 @@ const Navbar = (): JSX.Element => {
         localStorage.clear();
     };
 
-    useEffect(() => {}, []);
-
     return (
         <div className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container">
@@ -46,22 +46,35 @@ const Navbar = (): JSX.Element => {
                     id="navbarSupportedContent"
                 >
                     <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li className="nav-item me-1">
-                            <span
-                                className="nav-link active"
-                                onClick={onSignUpClick}
-                            >
-                                Sign up
-                            </span>
-                        </li>
-                        <li className="nav-item">
-                            <button
-                                className="btn btn-outline-light"
-                                onClick={onSignInClick}
-                            >
-                                Sign in
-                            </button>
-                        </li>
+                        {userInfo?.isLogin ? (
+                            <li className="nav-item me-1">
+                                <span
+                                    className="nav-link active"
+                                    onClick={onSignUpClick}
+                                >
+                                    {userInfo?.first_name}
+                                </span>
+                            </li>
+                        ) : (
+                            <>
+                                <li className="nav-item me-1">
+                                    <span
+                                        className="nav-link active"
+                                        onClick={onSignUpClick}
+                                    >
+                                        Sign up
+                                    </span>
+                                </li>
+                                <li className="nav-item">
+                                    <button
+                                        className="btn btn-outline-light"
+                                        onClick={onSignInClick}
+                                    >
+                                        Sign in
+                                    </button>
+                                </li>
+                            </>
+                        )}
                     </ul>
                 </div>
             </div>

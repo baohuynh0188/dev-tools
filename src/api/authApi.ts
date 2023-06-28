@@ -1,53 +1,40 @@
-interface SignInRequest {
+import axiosClient from "./axiosClient";
+
+interface ISignInRequest {
     username: string;
     password: string;
 }
 
-interface SignUpRequest {
+interface ISignUpRequest {
     first_name: string;
     username: string;
     password: string;
     confirm_password: string;
 }
 
-interface ChangePasswordRequest {
+interface IChangePasswordRequest {
     old_password: string;
     password: string;
     confirm_password: string;
 }
 
-interface ChangeFirstNameRequest {
+interface IChangeFirstNameRequest {
     old_password: string;
     password: string;
     confirm_password: string;
 }
 
-export const signIn = {
-    method: "POST",
-    url: "auth/token",
+const authApi = {
+    signIn: (params: ISignInRequest) => axiosClient.post("auth/token/", params),
+    signUp: (params: ISignUpRequest) =>
+        axiosClient.post("auth/register/", params),
+    getCurrentUser: () => axiosClient.get("auth/me/"),
+    refreshToken: (params: any) =>
+        axiosClient.post("auth/token/refresh/", params),
+    changePassword: (params: IChangePasswordRequest) =>
+        axiosClient.post("auth/change-password/", params),
+    changeFirstName: (params: IChangeFirstNameRequest) =>
+        axiosClient.put("auth/change-name/", params),
 };
 
-export const signUp = {
-    method: "POST",
-    url: "auth/register",
-};
-
-export const refreshToken = {
-    method: "POST",
-    url: "auth/token/refresh",
-};
-
-export const getCurrentUser = {
-    method: "GET",
-    url: "auth/me",
-};
-
-export const changePassword = {
-    method: "POST",
-    url: "auth/change-password",
-};
-
-export const changeFirstName = {
-    method: "PUT",
-    url: "auth/change-name",
-};
+export default authApi;

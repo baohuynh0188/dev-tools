@@ -4,17 +4,37 @@ interface IAuthProvider {
     children: React.ReactNode;
 }
 
-type IProductContext = [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+interface IUserInforResponse {
+    avatar: string;
+    first_name: string;
+    id: number;
+    isLogin: boolean;
+    username: string;
+}
 
-const AuthContext = createContext<IProductContext>([false, () => null]);
+const userInfoInit = {
+    avatar: "",
+    first_name: "",
+    id: 0,
+    isLogin: false,
+    username: "",
+};
 
-export const AuthProvider = ({ children }: IAuthProvider) => {
-    const [login, setLogin] = useState<boolean>(false);
+const AuthContext = createContext<IUserInforResponse>(userInfoInit);
+
+const AuthContextDispatch = createContext<
+    React.Dispatch<React.SetStateAction<IUserInforResponse>>
+>(() => null);
+
+const AuthProvider = ({ children }: IAuthProvider) => {
+    const [userInfo, setUserInfo] = useState<IUserInforResponse>(userInfoInit);
     return (
-        <AuthContext.Provider value={[login, setLogin]}>
-            {children}
+        <AuthContext.Provider value={userInfo}>
+            <AuthContextDispatch.Provider value={setUserInfo}>
+                {children}
+            </AuthContextDispatch.Provider>
         </AuthContext.Provider>
     );
 };
 
-export default AuthContext;
+export { AuthProvider, AuthContext, AuthContextDispatch };

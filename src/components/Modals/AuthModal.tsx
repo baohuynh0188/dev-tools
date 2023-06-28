@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ModalOverlay from "../ModalOverlay";
+import authApi from "../../api/authApi";
+import { setLocalAccessToken } from "../../utilities/localStorges";
+import { AuthContextDispatch } from "../../contexts/AuthContext";
 
 interface IAuthModal {
     show: boolean;
@@ -7,8 +10,57 @@ interface IAuthModal {
     onClose: () => void;
 }
 
+interface IInputValue {
+    first_name: string;
+    username: string;
+    password: string;
+    confirm_password: string;
+}
+
+const initInputValue = {
+    first_name: "",
+    username: "",
+    password: "",
+    confirm_password: "",
+};
+
 const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
     const isSignUp = title === "Sign Up";
+    const setLogin = useContext(AuthContextDispatch);
+    const [inputValue, setInputValue] = useState<IInputValue>(initInputValue);
+
+    useEffect(() => {
+        setInputValue(initInputValue);
+    }, [isSignUp]);
+
+    const onInputChangeHandler = (event: any) => {
+        const { name, value } = event?.target;
+        setInputValue((preState) => ({ ...preState, [name]: value }));
+    };
+
+    const onAuthSubmitHandler = async (event: any): Promise<void> => {
+        event.preventDefault();
+        try {
+            if (!isSignUp) {
+                const { username, password } = inputValue;
+                const response = await authApi.signIn({ username, password });
+                setLocalAccessToken(response?.data?.access_token);
+                setLogin({ ...response?.data, isLogin: true });
+                console.log("signIn OK ", response);
+                onClose();
+                return;
+            }
+            if (inputValue?.password === inputValue?.confirm_password) {
+                await authApi.signUp(inputValue);
+                console.log("signUp OK");
+                onClose();
+            }
+            console.log("password are not matched");
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <ModalOverlay
             title={title}
@@ -16,103 +68,75 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
             size={undefined}
             backdrop="static"
         >
-            <ModalOverlay.Body>
-                <form>
-                    <div className="input-group mb-3">
-                        <span className="input-group-text" id="username">
+            <form id="authentication-form" onSubmit={onAuthSubmitHandler}>
+                <ModalOverlay.Body>
+                    {isSignUp && (
+                        <div className="mb-3">
+                            <label htmlFor="first_name" className="form-label">
+                                Firstname
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="first_name"
+                                name="first_name"
+                                onChange={onInputChangeHandler}
+                            />
+                        </div>
+                    )}
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">
                             Username
-                        </span>
+                        </label>
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Enter your username..."
-                            aria-label="Username"
-                            aria-describedby="username"
+                            id="username"
+                            name="username"
+                            onChange={onInputChangeHandler}
+                            required
                         />
                     </div>
-                    <div className="input-group mb-3">
-                        <span className="input-group-text" id="password">
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">
                             Password
-                        </span>
+                        </label>
                         <input
                             type="password"
                             className="form-control"
-                            placeholder="Enter your password..."
-                            aria-label="Password"
-                            aria-describedby="password"
+                            id="password"
+                            name="password"
+                            autoComplete="off"
+                            onChange={onInputChangeHandler}
+                            required
                         />
                     </div>
                     {isSignUp && (
-                        <>
-                            <div className="input-group mb-3">
-                                <span
-                                    className="input-group-text"
-                                    id="first-name"
-                                >
-                                    First name
-                                </span>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter your first name..."
-                                    aria-label="First-name"
-                                    aria-describedby="first-name"
-                                />
-                            </div>
-                            <div className="input-group mb-3">
-                                <span
-                                    className="input-group-text"
-                                    id="username"
-                                >
-                                    Username
-                                </span>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter your username..."
-                                    aria-label="Username"
-                                    aria-describedby="username"
-                                />
-                            </div>
-                            <div className="input-group mb-3">
-                                <span
-                                    className="input-group-text"
-                                    id="password"
-                                >
-                                    Password
-                                </span>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    placeholder="Enter your password..."
-                                    aria-label="Password"
-                                    aria-describedby="password"
-                                />
-                            </div>
-                            <div className="input-group mb-3">
-                                <span
-                                    className="input-group-text"
-                                    id="confirm-password"
-                                >
-                                    Confirm-password
-                                </span>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    placeholder="Enter confirm password..."
-                                    aria-label="Confirm-password"
-                                    aria-describedby="Confirm-password"
-                                />
-                            </div>
-                        </>
+                        <div className="mb-3">
+                            <label
+                                htmlFor="confirm_password"
+                                className="form-label"
+                            >
+                                Confirm password
+                            </label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="confirm_password"
+                                name="confirm_password"
+                                autoComplete="off"
+                                onChange={onInputChangeHandler}
+                                required
+                            />
+                        </div>
                     )}
-                </form>
-            </ModalOverlay.Body>
-            <ModalOverlay.Footer onClose={onClose}>
-                <button className="btn btn-success" type="submit">
-                    {title}
-                </button>
-            </ModalOverlay.Footer>
+                </ModalOverlay.Body>
+                <ModalOverlay.Footer onClose={onClose}>
+                    <button className="btn btn-success" type="submit">
+                        {title}
+                    </button>
+                </ModalOverlay.Footer>
+            </form>
         </ModalOverlay>
     );
 };

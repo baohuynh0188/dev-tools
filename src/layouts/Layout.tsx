@@ -1,9 +1,29 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useCallback, useContext, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Notification from "../components/Notification";
 import { Outlet } from "react-router-dom";
+import { AuthContextDispatch } from "../contexts/AuthContext";
+import { getLocalAccessToken } from "../utilities/localStorges";
+import authApi from "../api/authApi";
 
 const Layout = (): JSX.Element => {
+    const setLogin = useContext(AuthContextDispatch);
+
+    const getUserInfo = useCallback(async () => {
+        const accessToken = getLocalAccessToken();
+        if (accessToken) {
+            try {
+                const response = await authApi.getCurrentUser();
+                console.log(response);
+                setLogin({ ...response?.data, isLogin: true });
+            } catch (error) {}
+        }
+    }, [setLogin]);
+
+    useEffect(() => {
+        getUserInfo();
+    }, [getUserInfo]);
+
     return (
         <Fragment>
             <Navbar />
