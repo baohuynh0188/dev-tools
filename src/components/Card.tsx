@@ -1,7 +1,9 @@
 import classNames from "classnames";
 import React from "react";
+import { Link } from "react-router-dom";
 
 interface ICard {
+    id: number;
     title?: string;
     description?: string | null;
     createdDate?: string;
@@ -9,7 +11,14 @@ interface ICard {
     imgSrc: string | null;
 }
 
-const Card = ({ title, description, createdDate, footer, imgSrc }: ICard) => {
+const Card = ({
+    id,
+    title,
+    description,
+    createdDate,
+    footer,
+    imgSrc,
+}: ICard) => {
     const renderImg = imgSrc && (
         <img src={imgSrc} className="img-fluid rounded-start" alt={title} />
     );
@@ -35,9 +44,11 @@ const Card = ({ title, description, createdDate, footer, imgSrc }: ICard) => {
 
         return (
             <>
-                <h5 className={cardTitleClass}>
-                    {title || <span className="placeholder col-6"></span>}
-                </h5>
+                <Link to={`/posts/${id}`}>
+                    <h5 className={cardTitleClass}>
+                        {title || <span className="placeholder col-6"></span>}
+                    </h5>
+                </Link>
                 <p className={cardTextClass}>
                     {description || (
                         <>

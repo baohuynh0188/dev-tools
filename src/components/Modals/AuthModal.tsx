@@ -45,17 +45,14 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                 const { username, password } = inputValue;
                 const response = await authApi.signIn({ username, password });
                 setLocalAccessToken(response?.data?.access_token);
-                setLogin({ ...response?.data, isLogin: true });
-                console.log("signIn OK ", response);
+                setLogin((preState) => ({ ...preState, isLogin: true }));
                 onClose();
                 return;
             }
             if (inputValue?.password === inputValue?.confirm_password) {
                 await authApi.signUp(inputValue);
-                console.log("signUp OK");
                 onClose();
             }
-            console.log("password are not matched");
         } catch (error) {
             console.error(error);
         }
@@ -107,6 +104,7 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                             id="password"
                             name="password"
                             autoComplete="off"
+                            minLength={6}
                             onChange={onInputChangeHandler}
                             required
                         />
@@ -125,6 +123,7 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                                 id="confirm_password"
                                 name="confirm_password"
                                 autoComplete="off"
+                                minLength={6}
                                 onChange={onInputChangeHandler}
                                 required
                             />

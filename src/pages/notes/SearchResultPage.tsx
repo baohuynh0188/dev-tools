@@ -34,7 +34,7 @@ interface IUseAxios {
 const SearchResultPage = (): JSX.Element => {
     const { response, loading, error }: IUseAxios = useAxios(getPosts);
 
-    const renderPosts = (): any => {
+    const renderPosts = (): JSX.Element[] | JSX.Element => {
         if (error && !response) {
             return <h1>Fetch Data failed</h1>;
         }
@@ -42,32 +42,25 @@ const SearchResultPage = (): JSX.Element => {
         if (loading) {
             return (
                 <>
-                    <Card
-                        key="loading-2"
-                        imgSrc={"http://via.placeholder.com/200x190"}
-                    />
-                    <Card
+                    {/* <Card
                         key="loading"
                         imgSrc={"http://via.placeholder.com/200x190"}
-                    />
+                    /> */}
                 </>
             );
         }
 
         return response?.results.map(
-            ({ id, title, description, created_at, thumbnail }) => {
-                return (
-                    <Card
-                        key={id}
-                        title={title}
-                        description={description}
-                        createdDate={created_at}
-                        imgSrc={
-                            thumbnail ?? "http://via.placeholder.com/1920x1080"
-                        }
-                    />
-                );
-            }
+            ({ id, title, description, created_at, thumbnail }) => (
+                <Card
+                    key={id}
+                    id={id}
+                    title={title}
+                    description={description}
+                    createdDate={created_at}
+                    imgSrc={thumbnail ?? "http://via.placeholder.com/1920x1080"}
+                />
+            )
         );
     };
 

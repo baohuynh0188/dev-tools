@@ -1,4 +1,5 @@
 import NotFoundPage from "./pages/NotFoundPage";
+import DetailPage from "./pages/notes/DetailPage";
 import SearchResultPage from "./pages/notes/SearchResultPage";
 import ReleaseTagsPage from "./pages/releasetags/ReleaseTagsPage";
 
@@ -19,6 +20,10 @@ const router: IRouter[] = [
     {
         path: "/posts",
         element: <SearchResultPage />,
+    },
+    {
+        path: "/posts/:id",
+        element: <DetailPage />,
     },
 ];
 

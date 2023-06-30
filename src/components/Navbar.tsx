@@ -1,9 +1,10 @@
 import React, { useContext, useState } from "react";
 import AuthModal from "./Modals/AuthModal";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext, AuthContextDispatch } from "../contexts/AuthContext";
 
 const Navbar = (): JSX.Element => {
     const userInfo = useContext(AuthContext);
+    const setLogin = useContext(AuthContextDispatch);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<"Sign In" | "Sign Up">(
         "Sign In"
@@ -25,6 +26,13 @@ const Navbar = (): JSX.Element => {
 
     const onLogoutClick = (): void => {
         localStorage.clear();
+        setLogin({
+            avatar: "",
+            first_name: "",
+            id: 0,
+            isLogin: false,
+            username: "",
+        });
     };
 
     return (
@@ -47,14 +55,21 @@ const Navbar = (): JSX.Element => {
                 >
                     <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                         {userInfo?.isLogin ? (
-                            <li className="nav-item me-1">
-                                <span
-                                    className="nav-link active"
-                                    onClick={onSignUpClick}
-                                >
-                                    {userInfo?.first_name}
-                                </span>
-                            </li>
+                            <>
+                                <li className="nav-item me-1">
+                                    <span className="nav-link active">
+                                        {userInfo?.first_name}
+                                    </span>
+                                </li>
+                                <li className="nav-item">
+                                    <button
+                                        className="btn btn-outline-danger"
+                                        onClick={onLogoutClick}
+                                    >
+                                        Log out
+                                    </button>
+                                </li>
+                            </>
                         ) : (
                             <>
                                 <li className="nav-item me-1">
