@@ -1,5 +1,6 @@
 import NotFoundPage from "./pages/NotFoundPage";
 import DetailPage from "./pages/notes/DetailPage";
+import ModifierPage from "./pages/notes/ModifierPage";
 import SearchResultPage from "./pages/notes/SearchResultPage";
 import ReleaseTagsPage from "./pages/releasetags/ReleaseTagsPage";
 
@@ -26,7 +27,19 @@ const router: IRouter[] = [
         element: <DetailPage />,
     },
     {
+        path: "/posts/add",
+        element: <ModifierPage />,
+    },
+    {
+        path: "/posts/update/:post",
+        element: <ModifierPage />,
+    },
+    {
         path: "/topic/:topic",
+        element: <SearchResultPage />,
+    },
+    {
+        path: "/search",
         element: <SearchResultPage />,
     },
 ];

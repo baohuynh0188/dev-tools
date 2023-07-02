@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../components/Card";
 import Topic from "../../components/Topic";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import IPost from "../../interfaces/post.interface";
 import postApi from "../../api/postApi";
 
@@ -10,13 +10,18 @@ const SearchResultPage = (): JSX.Element => {
     const location = useLocation();
     const [posts, setPosts] = useState<IPost[]>([]);
     const [loading, setloading] = useState<boolean>(true);
+    const [searchParams] = useSearchParams();
+    const searchQuery = searchParams.get("query") || "";
 
     useEffect(() => {
         const controller = new AbortController();
         const fetchPosts = async (): Promise<void> => {
             try {
                 const response = await postApi.getPosts({
-                    params: { ...params },
+                    params: {
+                        ...params,
+                        search: searchQuery,
+                    },
                     signal: controller.signal,
                 });
                 setPosts(response?.data?.results);
@@ -32,7 +37,7 @@ const SearchResultPage = (): JSX.Element => {
             controller.abort();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.pathname]);
+    }, [location.pathname, searchQuery]);
 
     const renderPosts = (): JSX.Element[] | JSX.Element => {
         if (loading) {

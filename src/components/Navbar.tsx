@@ -1,14 +1,17 @@
 import React, { useContext, useState } from "react";
 import AuthModal from "./Modals/AuthModal";
 import { AuthContext, AuthContextDispatch } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = (): JSX.Element => {
     const userInfo = useContext(AuthContext);
     const setLogin = useContext(AuthContextDispatch);
+    const navigate = useNavigate();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<"Sign In" | "Sign Up">(
         "Sign In"
     );
+    const [queryInput, setQueryInput] = useState<string>("");
 
     const onSignInClick = () => {
         setShowModal(true);
@@ -33,6 +36,11 @@ const Navbar = (): JSX.Element => {
             isLogin: false,
             username: "",
         });
+    };
+
+    const handleSearchSubmit = async (event: any) => {
+        event.preventDefault();
+        return navigate("/search?query=" + queryInput.trim());
     };
 
     return (
@@ -91,6 +99,24 @@ const Navbar = (): JSX.Element => {
                             </>
                         )}
                     </ul>
+                    <form className="d-flex ms-2" onSubmit={handleSearchSubmit}>
+                        <input
+                            className="form-control me-2"
+                            type="search"
+                            placeholder="Search"
+                            aria-label="Search"
+                            value={queryInput}
+                            onChange={(event) =>
+                                setQueryInput(event?.target?.value)
+                            }
+                        />
+                        <button
+                            className="btn btn-outline-success"
+                            type="submit"
+                        >
+                            Search
+                        </button>
+                    </form>
                 </div>
             </div>
             <AuthModal
