@@ -20,7 +20,12 @@ const Card = ({
     imgSrc,
 }: ICard) => {
     const renderImg = imgSrc && (
-        <img src={imgSrc} className="img-fluid rounded-start" alt={title} />
+        <img
+            src={imgSrc}
+            className="img-fluid rounded"
+            style={{ height: "100%", maxWidth: "100%" }}
+            alt={title}
+        />
     );
 
     const renderCreatedDate = createdDate ? (
@@ -44,7 +49,7 @@ const Card = ({
 
         return (
             <>
-                <Link to={`/posts/${id}`}>
+                <Link to={`/posts/${id}`} className="text-decoration-none">
                     <h5 className={cardTitleClass}>
                         {title || <span className="placeholder col-6"></span>}
                     </h5>

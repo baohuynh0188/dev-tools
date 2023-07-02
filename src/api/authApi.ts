@@ -1,4 +1,4 @@
-import axiosClient from "./axiosClient";
+import { axiosHttp, axiosHttpNoAuth } from "./axiosClient";
 
 interface ISignInRequest {
     username: string;
@@ -25,16 +25,16 @@ interface IChangeFirstNameRequest {
 }
 
 const authApi = {
-    signIn: (params: ISignInRequest) => axiosClient.post("auth/token/", params),
+    signIn: (params: ISignInRequest) => axiosHttp.post("auth/token/", params),
     signUp: (params: ISignUpRequest) =>
-        axiosClient.post("auth/register/", params),
-    getCurrentUser: () => axiosClient.get("auth/me/"),
+        axiosHttpNoAuth.post("auth/register/", params),
+    getCurrentUser: () => axiosHttp.get("auth/me/"),
     refreshToken: (params: any) =>
-        axiosClient.post("auth/token/refresh/", params),
+        axiosHttp.post("auth/token/refresh/", params),
     changePassword: (params: IChangePasswordRequest) =>
-        axiosClient.post("auth/change-password/", params),
+        axiosHttp.post("auth/change-password/", params),
     changeFirstName: (params: IChangeFirstNameRequest) =>
-        axiosClient.put("auth/change-name/", params),
+        axiosHttp.put("auth/change-name/", params),
 };
 
 export default authApi;

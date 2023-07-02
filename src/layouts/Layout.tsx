@@ -2,12 +2,11 @@ import React, { Fragment, useCallback, useContext, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Notification from "../components/Notification";
 import { Outlet } from "react-router-dom";
-import { AuthContext, AuthContextDispatch } from "../contexts/AuthContext";
+import { AuthContextDispatch } from "../contexts/AuthContext";
 import { getLocalAccessToken } from "../utilities/localStorges";
 import authApi from "../api/authApi";
 
 const Layout = (): JSX.Element => {
-    const userInfo = useContext(AuthContext);
     const setLogin = useContext(AuthContextDispatch);
 
     const getUserInfo = useCallback(async () => {

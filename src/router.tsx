@@ -22,8 +22,12 @@ const router: IRouter[] = [
         element: <SearchResultPage />,
     },
     {
-        path: "/posts/:id",
+        path: "/posts/:postId",
         element: <DetailPage />,
+    },
+    {
+        path: "/topic/:topic",
+        element: <SearchResultPage />,
     },
 ];
 

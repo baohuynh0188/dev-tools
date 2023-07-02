@@ -2,16 +2,21 @@ import axios from "axios";
 import qs from "qs";
 import { getLocalAccessToken } from "../utilities/localStorges";
 
-const axiosClient = axios.create({
+const axiosConfig = {
     baseURL: process.env.REACT_APP_BACKEND_API,
     headers: {
         "Content-Type": "application/json",
     },
+};
+
+// http with auth
+export const axiosHttp = axios.create({
+    ...axiosConfig,
     paramsSerializer: (params) => qs.stringify(params),
 });
 
 // Request interceptor
-axiosClient.interceptors.request.use(
+axiosHttp.interceptors.request.use(
     (config) => {
         if (getLocalAccessToken()) {
             config.headers.authorization = "Bearer " + getLocalAccessToken();
@@ -22,7 +27,7 @@ axiosClient.interceptors.request.use(
 );
 
 // Response interceptor
-axiosClient.interceptors.response.use(
+axiosHttp.interceptors.response.use(
     (response) => {
         return response;
     },
@@ -39,4 +44,5 @@ axiosClient.interceptors.response.use(
     }
 );
 
-export default axiosClient;
+// http without auth
+export const axiosHttpNoAuth = axios.create(axiosConfig);

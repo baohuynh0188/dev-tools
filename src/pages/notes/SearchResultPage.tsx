@@ -1,57 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../../components/Card";
-import useAxios from "../../hooks/useAxios";
-import { getPosts } from "../../api/postApi";
-
-interface IPost {
-    id: number;
-    title: string;
-    description: string | null;
-    thumbnail: string | null;
-    tags: string | null;
-    topic: {
-        id: number;
-        name: string;
-        avatar: string;
-    };
-    user: {
-        id: number;
-        first_name: string;
-        username: string;
-        avatar: string;
-    };
-    created_at: string;
-}
-
-interface IUseAxios {
-    response: {
-        results: IPost[];
-    };
-    error: string;
-    loading: boolean;
-}
+import Topic from "../../components/Topic";
+import { useLocation, useParams } from "react-router-dom";
+import IPost from "../../interfaces/post.interface";
+import postApi from "../../api/postApi";
 
 const SearchResultPage = (): JSX.Element => {
-    const { response, loading, error }: IUseAxios = useAxios(getPosts);
+    const params = useParams();
+    const location = useLocation();
+    const [posts, setPosts] = useState<IPost[]>([]);
+    const [loading, setloading] = useState<boolean>(true);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const fetchPosts = async (): Promise<void> => {
+            try {
+                const response = await postApi.getPosts({
+                    params: { ...params },
+                    signal: controller.signal,
+                });
+                setPosts(response?.data?.results);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setloading(false);
+            }
+        };
+        fetchPosts();
+
+        return () => {
+            controller.abort();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname]);
 
     const renderPosts = (): JSX.Element[] | JSX.Element => {
-        if (error && !response) {
-            return <h1>Fetch Data failed</h1>;
-        }
-
         if (loading) {
             return (
                 <>
-                    {/* <Card
+                    <Card
                         key="loading"
                         imgSrc={"http://via.placeholder.com/200x190"}
-                    /> */}
+                        id={0}
+                    />
                 </>
             );
         }
 
-        return response?.results.map(
-            ({ id, title, description, created_at, thumbnail }) => (
+        return posts?.map(
+            ({ id, title, description, created_at, thumbnail }: any) => (
                 <Card
                     key={id}
                     id={id}
@@ -66,8 +63,10 @@ const SearchResultPage = (): JSX.Element => {
 
     return (
         <>
-            <div className="col-9">{renderPosts()}</div>
-            <div className="col-3">2</div>
+            <div className="col-8">{renderPosts()}</div>
+            <div className="col-4">
+                <Topic />
+            </div>
         </>
     );
 };
