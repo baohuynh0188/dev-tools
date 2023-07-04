@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import AuthModal from "./Modals/AuthModal";
 import { AuthContext, AuthContextDispatch } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = (): JSX.Element => {
     const userInfo = useContext(AuthContext);
@@ -46,7 +46,9 @@ const Navbar = (): JSX.Element => {
     return (
         <div className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container">
-                <span className="navbar-brand">Dev-tools</span>
+                <Link to="/posts" className="navbar-brand">
+                    Dev-tools
+                </Link>
                 <button
                     className="navbar-toggler"
                     data-bs-toggle="collapse"
@@ -68,6 +70,14 @@ const Navbar = (): JSX.Element => {
                                     <span className="nav-link active">
                                         {userInfo?.first_name}
                                     </span>
+                                </li>
+                                <li className="nav-item me-1">
+                                    <Link
+                                        to="/posts/add"
+                                        className="btn btn-light"
+                                    >
+                                        Create Post
+                                    </Link>
                                 </li>
                                 <li className="nav-item">
                                     <button

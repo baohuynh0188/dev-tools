@@ -77,6 +77,7 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                                 className="form-control"
                                 id="first_name"
                                 name="first_name"
+                                value={inputValue.first_name}
                                 onChange={onInputChangeHandler}
                             />
                         </div>
@@ -90,6 +91,7 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                             className="form-control"
                             id="username"
                             name="username"
+                            value={inputValue.username}
                             onChange={onInputChangeHandler}
                             required
                         />
@@ -105,6 +107,7 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                             name="password"
                             autoComplete="off"
                             minLength={6}
+                            value={inputValue.password}
                             onChange={onInputChangeHandler}
                             required
                         />
@@ -124,6 +127,7 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                                 name="confirm_password"
                                 autoComplete="off"
                                 minLength={6}
+                                value={inputValue.confirm_password}
                                 onChange={onInputChangeHandler}
                                 required
                             />

@@ -8,7 +8,7 @@ const Topic = () => {
 
     useEffect(() => {
         const controller = new AbortController();
-        const fetchPost = async (): Promise<void> => {
+        const fetchTopic = async (): Promise<void> => {
             try {
                 const response = await topicApi.getTopics({
                     signal: controller.signal,
@@ -21,7 +21,7 @@ const Topic = () => {
             }
         };
 
-        fetchPost();
+        fetchTopic();
 
         return () => {
             controller.abort();

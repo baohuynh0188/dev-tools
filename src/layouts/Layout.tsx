@@ -2,11 +2,12 @@ import React, { Fragment, useCallback, useContext, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Notification from "../components/Notification";
 import { Outlet } from "react-router-dom";
-import { AuthContextDispatch } from "../contexts/AuthContext";
+import { AuthContext, AuthContextDispatch } from "../contexts/AuthContext";
 import { getLocalAccessToken } from "../utilities/localStorges";
 import authApi from "../api/authApi";
 
 const Layout = (): JSX.Element => {
+    const userInfo = useContext(AuthContext);
     const setLogin = useContext(AuthContextDispatch);
 
     const getUserInfo = useCallback(async () => {
@@ -19,9 +20,15 @@ const Layout = (): JSX.Element => {
                     ...response?.data,
                     isLogin: true,
                 }));
-            } catch (error) {}
+            } catch (error) {
+                setLogin((preState) => ({
+                    ...preState,
+                    isLogin: false,
+                }));
+            }
         }
-    }, [setLogin]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userInfo?.isLogin]);
 
     useEffect(() => {
         getUserInfo();

@@ -1,60 +1,82 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import topicApi from "../../api/topicApi";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext";
+import INewPost from "../../interfaces/newPost.interface";
+import postApi from "../../api/postApi";
 
 const ModifierPage = () => {
-    const handleEditorChange = (event: any, editor: any) => {
-        const data = editor.getData();
-        // setBlog({ ...newBlog, "content": data });
+    const navigate = useNavigate();
+    const userInfo = useContext(AuthContext);
+    const initialState = {
+        title: "",
+        content: "",
+        topic: "",
+        description: "",
+    };
+    const [newPost, setPost] = useState<INewPost>(initialState);
+    const [topics, setTopics] = useState<any[]>([]);
+    const [formValid, setFormValid] = useState<boolean>(false);
+    const [loading, setloading] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (!userInfo?.isLogin) {
+            return navigate("/posts");
+        }
+    }, [userInfo?.isLogin, navigate]);
+
+    useEffect(() => {
+        const controller = new AbortController();
+        const fetchTopic = async (): Promise<void> => {
+            try {
+                const response = await topicApi.getTopics({
+                    signal: controller.signal,
+                });
+                setTopics(response?.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setloading(false);
+            }
+        };
+
+        fetchTopic();
+
+        return () => {
+            controller.abort();
+        };
+    }, []);
+
+    const handleInputChange = (event: any) => {
+        const { name, value } = event?.target;
+        setPost((preState) => ({ ...preState, [name]: value }));
     };
 
-    function uploadPlugin(editor: any) {
-        editor.plugins.get("FileRepository").createUploadAdapter = (
-            loader: any
-        ) => {
-            return uploadAdapter(loader);
-        };
-    }
+    const handleEditorChange = (event: any, editor: any) => {
+        const content = editor.getData();
+        setPost((preState) => ({ ...preState, content }));
+    };
 
-    function uploadAdapter(loader: any) {
-        console.log(loader);
-
-        // return {
-        //     upload: () => {
-        //         return new Promise((resolve, reject) => {
-        //             loader.file.then((file) => {
-        //                 console.log("file>>>", file);
-        //                 let formData = new FormData();
-        //                 formData.append("url", file);
-        //                 formData.append("name", 72);
-        //                 formData.append("url1", "test body");
-        //                 console.log("body>>>", formData);
-        //                 for (var key of formData.entries()) {
-        //                     console.log(key[0] + ', ' + key[1]);
-        //                 }
-        //                 FilesService.upload(formData).then((response) => {
-        //                     console.log(response);
-        //                     resolve({
-        //                         default: `${process.env.REACT_APP_API}/${response.data.url}`
-        //                     });
-        //                 })
-        //                     .catch((err) => {
-        //                         reject(err);
-        //                         console.log(err);
-        //                     });
-        //             });
-        //         });
-        //     }
-        // };
-    }
+    const handleSubmit = async (event: any) => {
+        event.preventDefault();
+        console.log("[new post] ", newPost);
+        try {
+            await postApi.createPost(newPost);
+            console.log("Created OK");
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
-        <div className="col-12">
+        <form className="col-12" onSubmit={handleSubmit}>
             <h1 className="mb-3">Create post</h1>
             <div className="row mb-3">
                 <div className="col-9">
                     <label htmlFor="title" className="form-label">
-                        Title
+                        Title*
                     </label>
                     <input
                         type="text"
@@ -62,23 +84,32 @@ const ModifierPage = () => {
                         id="title"
                         name="title"
                         minLength={1}
+                        value={newPost.title}
+                        onChange={handleInputChange}
                         required
                     />
                 </div>
                 <div className="col-3">
                     <label htmlFor="topic" className="form-label">
-                        Topic
+                        Topic*
                     </label>
                     <select
                         className="form-select"
-                        aria-label="Default select example"
+                        aria-label="topic-select"
                         id="topic"
                         name="topic"
+                        defaultValue=""
+                        onChange={handleInputChange}
+                        required
                     >
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option value="" disabled>
+                            Choose a topic ...
+                        </option>
+                        {topics.map((topic) => (
+                            <option key={topic?.id} value={topic?.id}>
+                                {topic?.name}
+                            </option>
+                        ))}
                     </select>
                 </div>
             </div>
@@ -86,26 +117,37 @@ const ModifierPage = () => {
                 <label htmlFor="description" className="form-label">
                     Description
                 </label>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="description"
+                    name="description"
+                    value={newPost.description}
+                    onChange={handleInputChange}
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="content" className="form-label">
+                    Content*
+                </label>
                 <CKEditor
+                    id="content"
                     editor={ClassicEditor}
-                    data="<p>Hello from CKEditor 5!</p>"
-                    onReady={(editor) => {
-                        // You can store the "editor" and use when it is needed.
-                        console.log("Editor is ready to use!", editor);
-                    }}
-                    onChange={(event, editor) => {
-                        const data = editor.getData();
-                        console.log({ event, editor, data });
-                    }}
+                    data=""
+                    onChange={handleEditorChange}
                     onBlur={(event, editor) => {
-                        console.log("Blur.", editor);
-                    }}
-                    onFocus={(event, editor) => {
-                        console.log("Focus.", editor);
+                        setFormValid(!!editor.getData());
                     }}
                 />
             </div>
-        </div>
+            <button
+                className="btn btn-success"
+                type="submit"
+                disabled={!formValid}
+            >
+                Submit
+            </button>
+        </form>
     );
 };
 
