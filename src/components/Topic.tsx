@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import topicApi from "../api/topicApi";
+import { Spinner } from "react-bootstrap";
 
 const Topic = () => {
     const [topics, setTopics] = useState<any[]>([]);
-    const [loading, setloading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        setLoading(true);
         const controller = new AbortController();
         const fetchTopic = async (): Promise<void> => {
             try {
@@ -17,7 +19,7 @@ const Topic = () => {
             } catch (error) {
                 console.error(error);
             } finally {
-                setloading(false);
+                setLoading(false);
             }
         };
 
@@ -49,6 +51,10 @@ const Topic = () => {
             </li>
         )
     );
+
+    if (loading) {
+        return <Spinner animation="border" />;
+    }
 
     return <ul className="list-group">{renderTopics}</ul>;
 };

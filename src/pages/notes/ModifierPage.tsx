@@ -2,13 +2,15 @@ import React, { useContext, useEffect, useState } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import topicApi from "../../api/topicApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import INewPost from "../../interfaces/newPost.interface";
 import postApi from "../../api/postApi";
+import { Spinner } from "react-bootstrap";
 
 const ModifierPage = () => {
     const navigate = useNavigate();
+    const { post } = useParams();
     const userInfo = useContext(AuthContext);
     const initialState = {
         title: "",
@@ -19,7 +21,7 @@ const ModifierPage = () => {
     const [newPost, setPost] = useState<INewPost>(initialState);
     const [topics, setTopics] = useState<any[]>([]);
     const [formValid, setFormValid] = useState<boolean>(false);
-    const [loading, setloading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (!userInfo?.isLogin) {
@@ -28,7 +30,24 @@ const ModifierPage = () => {
     }, [userInfo?.isLogin, navigate]);
 
     useEffect(() => {
+        setLoading(true);
         const controller = new AbortController();
+
+        const fetchPostById = async (): Promise<void> => {
+            if (!post) return;
+            try {
+                const response = await postApi.getPostById(post, {
+                    signal: controller.signal,
+                });
+                setPost(response?.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPostById();
+
         const fetchTopic = async (): Promise<void> => {
             try {
                 const response = await topicApi.getTopics({
@@ -38,19 +57,19 @@ const ModifierPage = () => {
             } catch (error) {
                 console.error(error);
             } finally {
-                setloading(false);
+                setLoading(false);
             }
         };
-
         fetchTopic();
 
         return () => {
             controller.abort();
         };
-    }, []);
+    }, [post]);
 
     const handleInputChange = (event: any) => {
         const { name, value } = event?.target;
+        console.log({ [name]: value });
         setPost((preState) => ({ ...preState, [name]: value }));
     };
 
@@ -59,20 +78,46 @@ const ModifierPage = () => {
         setPost((preState) => ({ ...preState, content }));
     };
 
-    const handleSubmit = async (event: any) => {
+    const handleSubmit = (event: any) => {
         event.preventDefault();
-        console.log("[new post] ", newPost);
-        try {
-            await postApi.createPost(newPost);
-            console.log("Created OK");
-        } catch (error) {
-            console.log(error);
+        if (post) {
+            handleEdit();
+        } else {
+            handleCreate();
         }
     };
 
+    const handleCreate = async () => {
+        try {
+            const response = await postApi.createPost(newPost);
+            alert("Your post has been created!");
+            setPost(initialState);
+            navigate(`/posts/${response.data?.id}`);
+        } catch (error) {
+            console.log(error);
+            alert(error);
+        }
+    };
+
+    const handleEdit = async () => {
+        if (!post) return;
+        try {
+            const response = await postApi.putPostById(post, newPost);
+            alert("Your post has been updated!");
+            navigate(`/posts/${response.data?.id}`);
+        } catch (error) {
+            console.log(error);
+            alert(error);
+        }
+    };
+
+    if (loading) {
+        return <Spinner animation="border" />;
+    }
+
     return (
         <form className="col-12" onSubmit={handleSubmit}>
-            <h1 className="mb-3">Create post</h1>
+            <h1 className="mb-3">{post ? "Edit post" : "Create post"}</h1>
             <div className="row mb-3">
                 <div className="col-9">
                     <label htmlFor="title" className="form-label">
@@ -133,7 +178,7 @@ const ModifierPage = () => {
                 <CKEditor
                     id="content"
                     editor={ClassicEditor}
-                    data=""
+                    data={newPost.content}
                     onChange={handleEditorChange}
                     onBlur={(event, editor) => {
                         setFormValid(!!editor.getData());

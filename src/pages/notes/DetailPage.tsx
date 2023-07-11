@@ -4,21 +4,19 @@ import postApi from "../../api/postApi";
 import IPost from "../../interfaces/post.interface";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
+import { Spinner } from "react-bootstrap";
 
 const DetailPage = () => {
     const navigate = useNavigate();
     const { postId } = useParams();
     const userInfo = useContext(AuthContext);
     const [post, setPost] = useState<IPost>();
-    const [loading, setloading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (!postId) {
-            return;
-        }
-
+        if (!postId) return;
         const controller = new AbortController();
-        const fetchPost = async (): Promise<void> => {
+        const fetchPostById = async (): Promise<void> => {
             try {
                 const response = await postApi.getPostById(postId, {
                     signal: controller.signal,
@@ -27,11 +25,11 @@ const DetailPage = () => {
             } catch (error) {
                 console.error(error);
             } finally {
-                setloading(false);
+                setLoading(false);
             }
         };
 
-        fetchPost();
+        fetchPostById();
 
         return () => {
             controller.abort();
@@ -55,6 +53,10 @@ const DetailPage = () => {
         }
     };
 
+    if (loading) {
+        return <Spinner animation="border" />;
+    }
+
     return (
         <div className="row">
             <div className="col-9">
@@ -76,7 +78,7 @@ const DetailPage = () => {
                     <>
                         <h5 className="mt-4">Actions</h5>
                         <Link
-                            to={"edit/" + post.id}
+                            to={"/posts/update/" + post.id}
                             className="btn btn-warning me-2"
                         >
                             Edit

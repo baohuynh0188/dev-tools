@@ -6,8 +6,9 @@ const postApi = {
     getPostById: (id: string, params?: any) =>
         axiosHttpNoAuth.get(`posts/${id}`, params),
     createPost: (params: INewPost) => axiosHttp.post("posts/", params),
-    putPostById: (id: number, data: any) => axiosHttp.put(`posts/${id}`, data),
-    deletePostById: (id: number) => axiosHttp.delete(`posts/${id}`),
+    putPostById: (id: string, params: any) =>
+        axiosHttp.put(`posts/${id}/`, params),
+    deletePostById: (id: number) => axiosHttp.delete(`posts/${id}/`),
 };
 
 export default postApi;

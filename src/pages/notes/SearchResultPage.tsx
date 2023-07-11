@@ -10,7 +10,7 @@ const SearchResultPage = (): JSX.Element => {
     const location = useLocation();
     const observer = useRef<any>();
     const [posts, setPosts] = useState<IPost[]>([]);
-    const [loading, setloading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(true);
     const [hasMorePost, setHasMorePost] = useState<boolean>(false);
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [searchParams] = useSearchParams();
@@ -37,7 +37,7 @@ const SearchResultPage = (): JSX.Element => {
             } catch (error) {
                 console.error(error);
             } finally {
-                setloading(false);
+                setLoading(false);
             }
         };
         fetchPosts();
@@ -48,13 +48,17 @@ const SearchResultPage = (): JSX.Element => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname, searchQuery, pageNumber]);
 
+    useEffect(() => {
+        setPosts([]);
+        setPageNumber(1);
+    }, [searchQuery, params?.topic, params?.user, params?.tag]);
+
     const lastPostElementRef = useCallback(
         (node: any) => {
             if (loading) return;
             if (observer.current) observer.current.disconnect();
             observer.current = new IntersectionObserver((entries) => {
                 if (entries[0].isIntersecting && hasMorePost) {
-                    console.log("Visible");
                     setPageNumber((prevPageNumber) => prevPageNumber + 1);
                 }
             });
