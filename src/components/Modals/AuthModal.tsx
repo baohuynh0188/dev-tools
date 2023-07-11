@@ -46,11 +46,13 @@ const AuthModal = ({ show, title, onClose }: IAuthModal): JSX.Element => {
                 const response = await authApi.signIn({ username, password });
                 setLocalAccessToken(response?.data?.access_token);
                 setLogin((preState) => ({ ...preState, isLogin: true }));
+                alert("Login successfully");
                 onClose();
                 return;
             }
             if (inputValue?.password === inputValue?.confirm_password) {
                 await authApi.signUp(inputValue);
+                alert("Sign-up successfully");
                 onClose();
             }
         } catch (error) {
