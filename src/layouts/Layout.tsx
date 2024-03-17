@@ -1,22 +1,50 @@
-import React, { Fragment } from 'react'
-import { Container, Row } from 'react-bootstrap'
-import Navbar from '../components/Navbar'
+import React, { Fragment, useCallback, useContext, useEffect } from "react";
+import Navbar from "../components/Navbar";
+import Notification from "../components/Notification";
+import { Outlet } from "react-router-dom";
+import { AuthContext, AuthContextDispatch } from "../contexts/AuthContext";
+import { getLocalAccessToken } from "../utilities/localStorges";
+import authApi from "../api/authApi";
 
-const Layout = ({ children }: any): JSX.Element => {
-  return (
-    <Fragment>
-    <Navbar />
-    <Container>
-      <Row>
-        <div className="d-flex justify-content-center">
-          <div className="w-75 m-3">
-            {children}
-          </div>
-        </div>
-      </Row>
-    </Container>
-  </Fragment>
-  )
-}
+const Layout = (): JSX.Element => {
+    const userInfo = useContext(AuthContext);
+    const setLogin = useContext(AuthContextDispatch);
 
-export default Layout
+    const getUserInfo = useCallback(async () => {
+        const accessToken = getLocalAccessToken();
+        if (accessToken) {
+            try {
+                const response = await authApi.getCurrentUser();
+                setLogin((preState) => ({
+                    ...preState,
+                    ...response?.data,
+                    isLogin: true,
+                }));
+            } catch (error) {
+                setLogin((preState) => ({
+                    ...preState,
+                    isLogin: false,
+                }));
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userInfo?.isLogin]);
+
+    useEffect(() => {
+        getUserInfo();
+    }, [getUserInfo]);
+
+    return (
+        <Fragment>
+            <Navbar />
+            <Notification />
+            <div className="container">
+                <div className="row mt-3">
+                    <Outlet />
+                </div>
+            </div>
+        </Fragment>
+    );
+};
+
+export default Layout;
